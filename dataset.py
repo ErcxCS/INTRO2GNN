@@ -52,14 +52,14 @@ def plot_results_initial(anchors, X, weighted_means, intersections, M):
         if i < n_anchors:
             plt.annotate(f"A_{i}", xt)
         else:
-            bbox = intersections[i]
+            """ bbox = intersections[i]
             xmin, xmax, ymin, ymax = bbox
-            plt.plot([xmin, xmax, xmax, xmin, xmin], [ymin, ymin, ymax, ymax, ymin])
+            plt.plot([xmin, xmax, xmax, xmin, xmin], [ymin, ymin, ymax, ymax, ymin]) """
             plt.scatter(M[i, :, 0], M[i, :, 1], marker=".", s=10)
             plt.annotate(f"t_{i}", xt)
             plt.annotate(f"p_{i}", weighted_means[i - n_anchors])
     plt.legend()
-    plt.title(f"iter: {iter}, Predictions with initial weights")
+    plt.title(f"Initial, Predictions with initial weights")
     plt.show()
 
 def make_graph(
@@ -162,14 +162,14 @@ def make_graph(
     particles.data[fixed_mask] = particles.data[fixed_mask].detach()
 
     # Flatten particles if priors are used. Shape: (num_nodes, num_particles * d_dim)
-    x = particles.view(particles.shape[0], -1) if priors else None
+    #x = particles.view(particles.shape[0], -1) if priors else None
     #x = torch.mean(particles, dim=1) if priors else None
-    #x = torch.mean(particles, dim=1)
+    x = torch.mean(particles, dim=1)
     #print(x.shape)
 
-    """ np_x = x.detach().numpy()
+    np_x = x.detach().numpy()
     plot_results_initial(anchors, X_true, np_x, intersection_bbox, init_particles)
-    print(f"Init RMSE (mean particle estimates): {RMSE(X_true, np_x)}") """
+    print(f"Init RMSE (mean particle estimates): {RMSE(X_true, np_x)}")
 
     # Construct edge_index from the adjacency matrix `network`
     row, col = np.nonzero(network)
@@ -214,10 +214,21 @@ def make_graph(
     return graph_data
 
 if __name__ == "__main__":
-    """ graph = make_graph(priors=True, seed=21, num_particles=50)
-    print(graph.num_edge_features) """
+    graph = make_graph(
+        seed=21,
+        num_nodes=100,
+        d_dim=2,
+        num_particles=50,
+        num_anchors=7,
+        meters=100,
+        radius=22,
+        noise=1,
+        priors=False,
+        hop="two"
+    )
+    print(graph.num_edge_features)
 
-    x = np.arange(10).reshape(2,5)
+    """ x = np.arange(10).reshape(2,5)
     print(x)
-    print(x.T)
+    print(x.T) """
 

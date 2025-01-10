@@ -32,11 +32,6 @@ class GNN(nn.Module):
             nn.ReLU(),
             #nn.Dropout(p=0.2),
 
-            nn.Linear(128, 128),
-            #BatchNorm(128),
-            nn.ReLU(),
-            #nn.Dropout(p=0.2),
-
             nn.Linear(128, hidden_channels * in_channels),
         )
 
@@ -45,14 +40,12 @@ class GNN(nn.Module):
             out_channels=hidden_channels,
             nn=edge_network_1,
         )
-        
+
+        self.batch1 = BatchNorm(hidden_channels)
+        #self.drop1 = nn.Dropout(p=0.2)
+   
         edge_network_2 = nn.Sequential(
             nn.Linear(num_edge_features, 128),
-            #BatchNorm(128),
-            nn.ReLU(),
-            #nn.Dropout(p=0.2),
-
-            nn.Linear(128, 128),
             #BatchNorm(128),
             nn.ReLU(),
             #nn.Dropout(p=0.2),
@@ -71,12 +64,37 @@ class GNN(nn.Module):
             nn=edge_network_2
         )
 
-        #self.drop1 = nn.Dropout(p=0.2)
+        self.batch2 = BatchNorm(hidden_channels)
         #self.drop2 = nn.Dropout(p=0.2)
 
-        self.batch1 = BatchNorm(hidden_channels)
-        self.batch2 = BatchNorm(hidden_channels)
+        """ edge_network_3 = nn.Sequential(
+            nn.Linear(num_edge_features, 128),
+            #BatchNorm(128),
+            nn.ReLU(),
+            #nn.Dropout(p=0.2),
 
+            nn.Linear(128, 128),
+            #BatchNorm(128),
+            nn.ReLU(),
+            #nn.Dropout(p=0.2),
+
+            nn.Linear(128, hidden_channels * hidden_channels),
+        )
+
+        self.conv3 = NNConv(
+            in_channels=hidden_channels,
+            out_channels=hidden_channels,
+            nn=edge_network_3
+        ) """
+
+        #self.drop3 = nn.Dropout(p=0.2)
+        #self.batch3 = BatchNorm(hidden_channels)
+
+        """ self.fc = nn.Sequential(
+            nn.Linear(hidden_channels, hidden_channels),
+            nn.ReLU(),
+            nn.Linear(hidden_channels, d_dim)
+        ) """
         self.fc = nn.Linear(hidden_channels, d_dim)
 
     def forward(self, data: Data):
@@ -97,6 +115,12 @@ class GNN(nn.Module):
         x = self.batch2(x)
         x = F.relu(x)
         #x = self.drop2(x)
+
+        """ # ------ Layer 3 -------------
+        x = self.conv3(x, edge_index, edge_attr)
+        x = self.batch3(x)
+        x = F.relu(x)
+        #x = self.drop2(x) """
 
         # Final regression
         anchor_mask = data.anchor_mask.to(edge_index.device) if hasattr(data, 'anchor_mask') else None

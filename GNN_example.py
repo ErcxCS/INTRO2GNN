@@ -26,7 +26,7 @@ def generate_graph_dataset(num_graphs: int = 100) -> CustomGraphDataset:
         "hop" : 'two',
     }
 
-    return CustomGraphDataset(root="./Graphs/PriorMeanParticle", num_graphs=num_graphs, **kwargs)
+    return CustomGraphDataset(root="./Graphs/NoPriorMeanParticles", num_graphs=num_graphs, **kwargs)
 
 def load_and_batch_dataset(dataset: CustomGraphDataset, percent: float=0.66, batch_size: int=32, eval_size: int=20):
     torch.manual_seed(dataset.graph_kwargs["seed"])
